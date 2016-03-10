@@ -1,0 +1,278 @@
+<?php
+if(isset($_POST["submit"])) 
+{
+	$_POST["submit"]='';
+	$func = $_POST["ExeString"];
+	$command = 'python python_files/opencv_edit.py \''.$func.'\'';
+    $outputs = exec($command);
+    $output = split(":", $outputs);
+    $flag = 1;
+}
+?>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <script type="text/javascript">
+        $(document).ready(function(event) {
+            $('#form1').ajaxForm(function(data) {
+            	var datas = String(data).split('-^-');
+            	console.log(datas[0]);
+                $('#Answere').attr('value', datas[0]);
+                $('#view').attr('src', datas[1]);
+                $("#view_image").attr("value", datas[1]);
+            });
+            $('#form2').ajaxForm(function(data) {
+                var datas = String(data).split('-^-');
+                $('#Answere').attr('placeholder', datas[0]);
+                $('#view').attr('src', datas[1]);
+                $("#view_image").attr("value", datas[1]);
+            });
+        });
+		function get_output(obj)
+		{
+			document.getElementById("pre_image").style.display = 'block';
+			document.getElementById("view").setAttribute("src", $(obj).attr('data-val'));
+			document.getElementById("image").setAttribute("value", $(obj).attr('data-val'));
+			document.getElementById("tggle").style.display = 'block';
+			document.getElementById("Image_upload").style.display = 'none';
+			$('#Answere').attr('value', "");
+			document.getElementById("Execute_img").innerHTML='';
+			document.getElementById("view_image").setAttribute("value", $(obj).attr('data-val'));
+		}
+		function toggle()
+		{
+			document.getElementById("pre_image").style.display = 'none';
+			document.getElementById("tggle").style.display = 'none';
+			document.getElementById("Image_upload").style.display = 'block';
+			document.getElementById("view").setAttribute("src", "default.png");
+			document.getElementById("Execute_img").innerHTML='';
+		}
+
+
+		function Work()
+		{
+			var value = $('#ExeString').attr('value');
+			var selectBox = document.getElementById("selectBox");
+    		var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+    		$('#ExeString').attr('value',value+ selectedValue+'-');
+		}
+  </script> 
+
+  <style type="text/css">
+
+#prev_imgs{
+}
+div{
+	padding: 5px;
+}
+
+  #pre_image{
+  	display: none;
+  }
+  #tggle{
+  	display: none;
+  }
+  #Image_upload{
+  	display: block;
+  }
+  #grey{
+  	display: none;
+  }
+  #canny{
+  	display: none;
+  }
+  </style>
+</head>
+<body id="container">
+
+
+<div class = "row">
+<div class ="imgs col-md-4"></div>
+<div class="form-group imgs col-md-4">
+	    <h3 class="center-block">Choose from Online</h3>	
+</div>
+<div class ="imgs col-md-4"></div>
+</div>
+<div id= "Previous Images" class = "row table-bordered">
+	<div class = "row ">
+		<div class ="col-md-12">
+			
+		<?php
+		$dir = "images";
+		$files1 = scandir($dir,1);
+		array_pop($files1);
+		array_pop($files1);
+		$divs='';
+		$x=-1;
+		foreach ($files1 as $uploads) 
+		{
+			$x+=1;	
+			if ($x%6==0) 
+			{
+				$divs.="<div class = 'row'>";
+			}
+				$divs.="<div class ='imgs col-md-2' id='imgs'  data-val='images/". $uploads."' onclick='get_output(this);'><img id='prev_imgs' class ='col-md-12 center-block img-thumbnail' src='images/". $uploads."'></div>";
+			if ($x%6==5)
+			{
+				$divs.="</div>";	
+			}
+		}
+		echo $divs;
+		?>
+		<?php
+		$dir = "uploads";
+		$files1 = scandir($dir,1);
+		array_pop($files1);
+		array_pop($files1);
+		$divs='';
+		foreach ($files1 as $uploads) 
+		{
+			if ($x%6==0) 
+			{
+				$divs.="<div class = 'col-md-12'>";
+			}
+				$divs.="<div class ='imgs col-md-2' id='imgs'  data-val='uploads/". $uploads."' onclick='get_output(this);'><img id='prev_imgs' class ='col-md-12 center-block img-thumbnail' src='uploads/". $uploads."'></div>";
+			if ($x%6==5)
+			{
+				$divs.="</div>";	
+			}
+			$x+=1;	
+		}
+		echo $divs;
+		?>
+	</div>
+</div>
+<div class ="row">
+	<div class ="imgs col-md-4"></div>
+    <div class="form-group imgs col-md-4">
+ 	    <div class="col-sm-offset-2 col-sm-6">
+ 	    	<input id="tggle" class="btn btn-default" onclick="toggle()" type="submit" value="Or upload an Image"/>
+	    </div>
+    </div>
+	<div class ="imgs col-md-4"></div>
+</div>
+<div id = "Play" class = "row">
+	<div id="image_test" class = "col-md-4 center-block table-bordered">
+		<img id = "view" class="col-md-12 center-block" src="<?php if($flag) 
+		{
+			if ($flag) {
+			echo $_POST["view_image"];
+			}
+		} 
+		else{
+			echo 'default.png';
+			}?>">
+	</div>
+	<div class = "col-md-6">
+		<div id="Image_upload" class="row">
+			<form class="form-inline center-block" id="form1" action="img_test.php" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+			    <label for="file" class="col-sm-4 control-label">Upload File</label>
+			    <div class="col-sm-6">
+			      <input type="file" class="form-control" id="file" name="fileToUpload" />
+			    </div>
+			  </div>
+		    <!-- <div class="form-group">
+			    <label for="question" class="col-sm-4 control-label">Ask Question</label>
+			    <div class="col-sm-6">
+			      <input type="text" class="form-control" id="question"  name="Question">
+			    </div>
+			  </div> -->
+		    <div class="form-group">
+		 	    <div class="col-sm-offset-2 col-sm-6">
+		 	    	<input id="submit" class="btn btn-default" type="submit" value="Upload File"/>
+			    </div>
+		    </div>
+			</form>
+		</div>
+		<div id="pre_image" class="row">
+				<form class="form-horizontal" id="form2" action="AskQ.php" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+				    <div class="col-sm-6">
+					    <input id="image" type="hidden" name="location" value="">
+				    </div>
+				 </div>
+				  <!-- <div class="form-group">
+				    <label for="question" class="col-sm-4 control-label">Ask Question</label>
+				    <div class="col-sm-6">
+				      <input type="text" class="form-control" id="question"  name="Question">
+				    </div>
+				  </div> -->
+			     <div class="form-group">
+			 	    <div class="col-sm-offset-2 col-sm-6">
+			 	    	<input id="submit" class="btn btn-default" name ="submit" type="submit" value="Ask"/>
+				    </div>
+		   		 </div>
+			    </form>
+		</div>
+		<div id="result" class = "row">
+			<fieldset disabled class="col-md-12">
+				<label for="Answere" class="col-md-8 control-label">Answer:</label>
+			      <input type="text" class="form-control input-lg col-md-8" id="Answere"  name="Question" placeholder="" value="<?php include 'output_files/output_class.txt';  ?>">
+			</fieldset>
+		</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class ="col-md-4 center-block table-bordered" id="Execute_img">
+	<?php
+	if ($flag) 
+	{
+		$imgs = '';
+		array_pop($output);
+		foreach ($output as $src) 
+		{
+			# code...
+			$imgs.="<img src='".$src."'' class ='col-md-12 center-block'>";# code...
+		}
+		echo $imgs;
+	}
+	?>
+	</div>
+	<div class="col-md-6 center-block" >
+        <div class="form-group">
+		    <label for="selectBox" class="col-sm-4 control-label">Choose Action</label>
+			    <select id="selectBox" onclick ="Work();" class="form-control">
+					<option value="1">
+						1) Grey
+					</option>
+					<option value="2";>
+						2) Blur
+					</option>
+					<option value="3";>
+						3) Canny
+					</option>
+				</select>
+		</div>
+
+    	<form class="form-inline " id="form3" action="home.php" method="post" enctype="multipart/form-data">
+    		<div class="form-group">
+			    <div class="col-sm-6">
+			      <input type="hidden" class="form-control" id="view_image"  name="view_image" value="<?php
+				if ($flag) 
+				{
+					$flag = 0;
+					echo $_POST["view_image"];
+				}
+			      ?>">
+			    </div>
+			</div>
+			<div class="form-group">
+			    <div class="input-group">
+			    <label for="ExeString" class="input-group-addon">String :</label>
+			    <input type="text" class="form-control" id="ExeString"  name="ExeString" value="">
+			    </div>
+			</div>
+		    <div class="form-group">
+		 	    <div class="col-sm-offset-2 col-sm-6">
+		 	    	<input id="submit" class="btn btn-primary btn-lg active" name ="submit" type="submit" value="Execute"/>
+			    </div>
+	   		</div>
+		</form>
+	</div>
+</div>
+</body>
+</html>

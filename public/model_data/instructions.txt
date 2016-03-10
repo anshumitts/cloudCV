@@ -1,0 +1,9 @@
+Copy paste the following data drom AViSingh
+/labelencoder.pkl
+/labelencoder.pkl_01.npy
+/lstm_1_num_hidden_units_lstm_512_num_hidden_units_mlp_1024_num_hidden_layers_mlp_3.json
+/lstm_1_num_hidden_units_lstm_512_num_hidden_units_mlp_1024_num_hidden_layers_mlp_3_epoch_070.hdf5
+/modelmlp.npz
+/vgg_feats.mat
+/vgg_features.prototxt
+/VGG_ILSVRC_16_layers.caffemodel
